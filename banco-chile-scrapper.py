@@ -55,9 +55,10 @@ class BancoChileScraper:
         self.logged_in = True
 
     def get_transactions(self):
-        products = self._call(
-            'https://portalpersonas.bancochile.cl/mibancochile/rest/persona/selectorproductos/selectorProductos/obtenerProductos').json()
-        
+        try:
+            products = self._call('selectorproductos/selectorProductos/obtenerProductos').json()
+        except:
+            raise ValueError("Could not get products")
         accounts = [product for product in products["productos"] if product["tipo"] == "cuenta"]
 
         cartola_request = {
@@ -72,8 +73,10 @@ class BancoChileScraper:
                 "moneda": accounts[0]["codigoMoneda"]
             }],
             "cabecera": {"paginacionDesde": {}, "statusGenerico": True}}
-
-        transactions = self._call('https://portalpersonas.bancochile.cl/mibancochile/rest/persona/movimientos/getcartola', method="post", json=cartola_request).json()
+        try:
+            transactions = self._call('movimientos/getcartola', method="post", json=cartola_request).json()
+        except:
+            raise ValueError("Could not get transactions")
         return transactions
 
     def _call(self, url, *args, enforce_login=True, method="get", **kwargs):
@@ -96,6 +99,6 @@ class BancoChileScraper:
 if __name__ == "__main__":
     username = input("BancoChile username: ")
     password = input("BancoChile password: ")
-    banco = BancoChileScraper(username, password)
-    banco.login()
-    print(banco.get_transactions())
+    bank = BancoChileScraper(username, password)
+    bank.login()
+    print(bank.get_transactions())
