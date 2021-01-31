@@ -4,6 +4,7 @@ from http.cookiejar import Cookie
 
 import requests
 
+
 class BancoChileScraper:
 
     USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
@@ -57,7 +58,7 @@ class BancoChileScraper:
     def get_transactions(self):
         try:
             products = self._call('selectorproductos/selectorProductos/obtenerProductos').json()
-        except:
+        except Exception:
             raise ValueError("Could not get products")
         accounts = [product for product in products["productos"] if product["tipo"] == "cuenta"]
 
@@ -75,7 +76,7 @@ class BancoChileScraper:
             "cabecera": {"paginacionDesde": {}, "statusGenerico": True}}
         try:
             transactions = self._call('movimientos/getcartola', method="post", json=cartola_request).json()
-        except:
+        except Exception:
             raise ValueError("Could not get transactions")
         return transactions
 
